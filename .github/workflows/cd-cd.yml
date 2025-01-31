@@ -1,4 +1,4 @@
-name: AKS Deployment Pipeline 
+name: AKS Deployment Pipeline
 
 on:
   push:
@@ -63,10 +63,18 @@ jobs:
           cluster-name: ${{ env.AKS_CLUSTER_NAME }}
           resource-group: ${{ env.RESOURCE_GROUP }}
 
-      - name: Replace image name in deployment.yaml
+      - name: Replace placeholders in deployment.yaml
         run: |
-          # Replace TEST_IMAGE_NAME with the actual image name in deployment.yaml
+          # Replace placeholders in deployment.yaml with actual values
+          sed -i "s,{{APP_NAME}},${{ env.APP_NAME }}," ./k8s/deployment.yaml
+          sed -i "s,{{DEPLOY_ENV}},${{ env.DEPLOY_ENV }}," ./k8s/deployment.yaml
           sed -i "s,TEST_IMAGE_NAME,${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}," ./k8s/deployment.yaml
+
+      - name: Replace placeholders in service.yaml
+        run: |
+          # Replace placeholders in service.yaml
+          sed -i "s,{{APP_NAME}},${{ env.APP_NAME }}," ./k8s/service.yaml
+          sed -i "s,{{DEPLOY_ENV}},${{ env.DEPLOY_ENV }}," ./k8s/service.yaml
 
       - name: Apply Kubernetes Manifests
         run: |
