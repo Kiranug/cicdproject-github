@@ -76,6 +76,12 @@ jobs:
           sed -i "s,{{APP_NAME}},${{ env.APP_NAME }}," ./k8s/service.yaml
           sed -i "s,{{DEPLOY_ENV}},${{ env.DEPLOY_ENV }}," ./k8s/service.yaml
 
+      - name: Publish deployment manifests as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: kubernetes-deployment-manifests
+          path: ./k8s/*.yaml # Path to the YAML files you want to upload as artifacts
+
       - name: Apply Kubernetes Manifests
         run: |
           # Apply the final YAML files after the image name is replaced
