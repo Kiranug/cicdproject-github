@@ -32,9 +32,9 @@ jobs:
 
       - name: Authenticate to ACR using Azure CLI
         run: |
+          az acr login --name ${{ env.ACR_NAME }} --expose-token
           ACR_TOKEN=$(az acr login --name ${{ env.ACR_NAME }} --expose-token --output tsv --query accessToken)
           echo $ACR_TOKEN | docker login ${{ env.ACR_NAME }}.azurecr.io -u 00000000-0000-0000-0000-000000000000 --password-stdin
-
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
