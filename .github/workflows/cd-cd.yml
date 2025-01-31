@@ -9,7 +9,7 @@ on:
         description: 'Deployment environment'
         required: true
         default: 'dev'
-      
+
 permissions:
   id-token: write    # Required for OIDC authentication
   contents: read     # Allows reading repository contents
@@ -66,18 +66,15 @@ jobs:
       - name: Replace placeholders in deployment.yaml files
         run: |
           # Replace placeholders with actual values in all YAML files in the kube-manifest folder
-          for file in ./k8s/*.yaml; do
-            envsubst < $file > ./k8s/$(basename $file .yaml)-final.yaml
+          for file in ./kube-manifest/*.yaml; do
+            envsubst < $file > ./kube-manifest/$(basename $file .yaml)-final.yaml
           done
 
-      - name: Deploy to AKS
+      - name: Apply Kubernetes Manifests
         run: |
-          # Apply all the final YAML files in the kube-manifest folder
-          for file in ./k8s/*-final.yaml; do
-            kubectl apply -f $file -n ${{ env.DEPLOY_ENV }}
-          done
-          kubectl rollout status deployment/${{ env.APP_NAME }} -n ${{ env.DEPLOY_ENV }}
-
+          # Apply the final YAML files after placeholder replacement
+          kubectl apply -f ./kube-manifest/
+      
       - name: Get Application URL
         run: |
           APP_URL=$(kubectl get service ${{ env.APP_NAME }}-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
