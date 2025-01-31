@@ -63,18 +63,16 @@ jobs:
           cluster-name: ${{ env.AKS_CLUSTER_NAME }}
           resource-group: ${{ env.RESOURCE_GROUP }}
 
-      - name: Replace placeholders in deployment.yaml files
+      - name: Replace image name in deployment.yaml
         run: |
-          # Replace placeholders with actual values in all YAML files in the kube-manifest folder
-          for file in ./k8s/*.yaml; do
-            envsubst < $file > ./k8s/$(basename $file .yaml)-final.yaml
-          done
+          # Replace TEST_IMAGE_NAME with the actual image name in deployment.yaml
+          sed -i "s,TEST_IMAGE_NAME,${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}," ./k8s/deployment.yaml
 
       - name: Apply Kubernetes Manifests
         run: |
-          # Apply the final YAML files after placeholder replacement
+          # Apply the final YAML files after the image name is replaced
           kubectl apply -f ./k8s/
-      
+        
       - name: Get Application URL
         run: |
           APP_URL=$(kubectl get service ${{ env.APP_NAME }}-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
