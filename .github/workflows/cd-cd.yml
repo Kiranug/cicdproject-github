@@ -1,4 +1,4 @@
-name: AKS Deployment Pipeline
+name: AKS Deployment Pipeline 
 
 on:
   push:
