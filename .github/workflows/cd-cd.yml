@@ -8,7 +8,7 @@ on:
       environment:
         description: 'Deployment environment'
         required: true
-        default: 'staging'
+        default: 'dev'
       
 permissions:
   id-token: write    # Required for OIDC authentication
