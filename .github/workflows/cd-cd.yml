@@ -66,14 +66,14 @@ jobs:
       - name: Replace placeholders in deployment.yaml files
         run: |
           # Replace placeholders with actual values in all YAML files in the kube-manifest folder
-          for file in ./kube-manifest/*.yaml; do
-            envsubst < $file > ./kube-manifest/$(basename $file .yaml)-final.yaml
+          for file in ./k8s/*.yaml; do
+            envsubst < $file > ./k8s/$(basename $file .yaml)-final.yaml
           done
 
       - name: Deploy to AKS
         run: |
           # Apply all the final YAML files in the kube-manifest folder
-          for file in ./kube-manifest/*-final.yaml; do
+          for file in ./k8s/*-final.yaml; do
             kubectl apply -f $file -n ${{ env.DEPLOY_ENV }}
           done
           kubectl rollout status deployment/${{ env.APP_NAME }} -n ${{ env.DEPLOY_ENV }}
