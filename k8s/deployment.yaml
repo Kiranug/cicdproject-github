@@ -12,6 +12,8 @@ spec:
       labels:
         app: {{APP_NAME}}
     spec:
+      imagePullSecrets:
+        - name: acrpull-secretnew  # Reference the secret created
       containers:
       - name: {{APP_NAME}}
         image: TEST_IMAGE_NAME
