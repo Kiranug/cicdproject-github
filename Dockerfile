@@ -2,14 +2,11 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copy package.json and package-lock.json from /src/app/ to /app/ in the container
+# Copy package.json and package-lock.json
 COPY src/app/package*.json ./
 
-# Debugging step: List files to check if package-lock.json is copied
-RUN ls -la /app
-
-# Install production dependencies
-RUN npm ci --only=production --verbose
+# Install all dependencies (including dev dependencies for testing)
+RUN npm ci --verbose
 
 # Copy the rest of the application files
 COPY src/app/ ./
@@ -17,11 +14,14 @@ COPY src/app/ ./
 # Run tests
 RUN npm run test
 
+# Remove dev dependencies after tests to reduce image size
+RUN npm prune --production
+
 # Runtime stage
 FROM node:18-alpine
 WORKDIR /app
 
-# Copy only the necessary files from the build stage
+# Copy only necessary files from the builder stage
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
 
