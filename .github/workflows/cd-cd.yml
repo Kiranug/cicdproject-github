@@ -29,23 +29,16 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Login to ACR using OIDC Token
-        run: |
-          # Obtain the ACR token
-          ACR_TOKEN=$(az acr login --name ${{ env.ACR_NAME }} --expose-token --output tsv --query accessToken)
-          # Login to Docker using ACR token
-          echo $ACR_TOKEN | docker login ${{ env.ACR_NAME }}.azurecr.io -u 00000000-0000-0000-0000-000000000000 --password-stdin
-
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
+        
+      - name: 'Build and push image'
+        uses: azure/docker-login@v1
         with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-            ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:latest
-          cache-from: type=gha
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker build . -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+
 
   deploy-to-aks:
     runs-on: ubuntu-latest
