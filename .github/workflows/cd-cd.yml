@@ -66,14 +66,14 @@ jobs:
       - name: Replace placeholders in deployment.yaml files
         run: |
           # Replace placeholders with actual values in all YAML files in the kube-manifest folder
-          for file in ./kube-manifest/*.yaml; do
-            envsubst < $file > ./kube-manifest/$(basename $file .yaml)-final.yaml
+          for file in ./k8s/*.yaml; do
+            envsubst < $file > ./k8s/$(basename $file .yaml)-final.yaml
           done
 
       - name: Apply Kubernetes Manifests
         run: |
           # Apply the final YAML files after placeholder replacement
-          kubectl apply -f ./kube-manifest/
+          kubectl apply -f ./k8s/
       
       - name: Get Application URL
         run: |
