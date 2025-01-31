@@ -9,6 +9,10 @@ on:
         description: 'Deployment environment'
         required: true
         default: 'staging'
+      
+permissions:
+  id-token: write    # Required for OIDC authentication
+  contents: read     # Allows reading repository contents
 
 env:
   ACR_NAME: kiranacrdevops
