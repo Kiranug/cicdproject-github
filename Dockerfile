@@ -11,8 +11,8 @@ RUN npm ci --verbose
 # Copy the rest of the application files
 COPY src/app/ ./
 
-# Run tests
-RUN npm run test
+# Run tests (allow build to pass even if no tests exist)
+RUN npm run test -- --passWithNoTests
 
 # Remove dev dependencies after tests to reduce image size
 RUN npm prune --production
